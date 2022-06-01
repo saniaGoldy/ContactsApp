@@ -4,10 +4,12 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
 import android.widget.CursorAdapter
 import android.widget.ListView
 import androidx.cursoradapter.widget.SimpleCursorAdapter
@@ -80,8 +82,14 @@ class ListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>,
             )
             // Sets the adapter for the ListView
             contactsList.adapter = cursorAdapter
+            contactsList.descendantFocusability = ListView.FOCUS_BLOCK_DESCENDANTS
+            contactsList.setOnItemClickListener(this)
+
+            /*contactsList.onItemClickListener = OnItemClickListener { parent, view, position, id ->
+                val selectedItem = parent.getItemAtPosition(position) as String
+                Log.d("MyApp", "onActivityCreated: ")
+            }*/
         }
-        contactsList.onItemClickListener = this
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,6 +122,7 @@ class ListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>,
     }
 
     override fun onItemClick(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+        Log.d("MyApp", "onItemClick: ")
         // Get the Cursor
         val cursor: Cursor? = (parent.adapter as? CursorAdapter)?.cursor?.apply {
             // Move to the selected contact
