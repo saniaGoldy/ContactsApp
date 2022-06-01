@@ -16,9 +16,9 @@ import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 
-private val FROM_COLUMNS: Array<String> = arrayOf(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
+private val FROM_COLUMNS: Array<String> = arrayOf(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY, ContactsContract.CommonDataKinds.Phone.NUMBER)
 
-private val TO_IDS: IntArray = intArrayOf(android.R.id.text1)
+private val TO_IDS: IntArray = intArrayOf(android.R.id.text1, android.R.id.text2)
 
 // The column index for the _ID column
 private const val CONTACT_ID_INDEX: Int = 0
@@ -26,11 +26,11 @@ private const val CONTACT_ID_INDEX: Int = 0
 // The column index for the CONTACT_KEY column
 private const val CONTACT_KEY_INDEX: Int = 1
 
-
 private val PROJECTION: Array<out String> = arrayOf(
-    ContactsContract.Contacts._ID,
+    ContactsContract.Data._ID,
     ContactsContract.Contacts.LOOKUP_KEY,
     ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
+    ContactsContract.CommonDataKinds.Phone.NUMBER
 )
 
 
@@ -94,7 +94,7 @@ class ListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>,
 
             return CursorLoader(
                 it,
-                ContactsContract.Contacts.CONTENT_URI,
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 PROJECTION,
                 null,
                 null,
