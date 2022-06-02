@@ -11,6 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
+import com.example.contactsapp.placeholder.ContactsData
 
 
 val CONTACT_PROJECTION: Array<out String> = arrayOf(
@@ -34,20 +35,24 @@ class MainActivity : AppCompatActivity() {
         }
 
         val contactsData = requestContacts()
+        ContactsData.ITEMS.apply {
+            this.clear()
+            this.addAll(contactsData)
+        }
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                add<ListFragment>(R.id.fragmentContainerView)
+                add<ContactFragment>(R.id.fragmentContainerView)
             }
         }
 
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun requestContacts(): MutableList<ContactData> {
+    private fun requestContacts(): MutableList<ContactsData.ContactData> {
 
-        val result: MutableList<ContactData> = mutableListOf()
+        val result: MutableList<ContactsData.ContactData> = mutableListOf()
         contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null)
             ?.use { cursor ->
                 if (cursor.moveToFirst()) {
@@ -61,7 +66,7 @@ class MainActivity : AppCompatActivity() {
                             cursor.getString(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[3]))
 
                         result.add(
-                            ContactData(
+                            ContactsData.ContactData(
                                 contactId,
                                 name,
                                 listOf(phoneNumber),

@@ -1,5 +1,6 @@
 package com.example.contactsapp.placeholder
 
+import android.net.Uri
 import java.util.ArrayList
 import java.util.HashMap
 
@@ -14,11 +15,10 @@ object ContactsData {
     /**
      * An array of sample (placeholder) items.
      */
-    val ITEMS: MutableList<PlaceholderItem> = ArrayList()
+    val ITEMS: MutableList<ContactData> = ArrayList()
 
-    /**
+    /*
      * A map of sample (placeholder) items, by ID.
-     */
     val ITEM_MAP: MutableMap<String, PlaceholderItem> = HashMap()
 
     private val COUNT = 25
@@ -37,7 +37,7 @@ object ContactsData {
 
     private fun createPlaceholderItem(position: Int): PlaceholderItem {
         return PlaceholderItem(position.toString(), "Item " + position, makeDetails(position))
-    }
+    }*/
 
     private fun makeDetails(position: Int): String {
         val builder = StringBuilder()
@@ -51,7 +51,10 @@ object ContactsData {
     /**
      * A placeholder item representing a piece of content.
      */
-    data class PlaceholderItem(val id: String, val content: String, val details: String) {
-        override fun toString(): String = content
-    }
+    data class ContactData(
+        val contactId: Long,
+        val name: String,
+        val phoneNumber: List<String>,
+        val avatar: Uri?
+    )
 }

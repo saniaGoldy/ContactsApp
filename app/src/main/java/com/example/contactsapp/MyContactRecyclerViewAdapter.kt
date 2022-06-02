@@ -1,19 +1,14 @@
 package com.example.contactsapp
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
-
-import com.example.contactsapp.placeholder.ContactsData.PlaceholderItem
+import androidx.recyclerview.widget.RecyclerView
 import com.example.contactsapp.databinding.FragmentContactItemBinding
+import com.example.contactsapp.placeholder.ContactsData
 
-/**
- * [RecyclerView.Adapter] that can display a [PlaceholderItem].
- * TODO: Replace the implementation with code for your data type.
- */
 class MyContactRecyclerViewAdapter(
-    private val values: List<ContactData>
+    private val values: List<ContactsData.ContactData>
 ) : RecyclerView.Adapter<MyContactRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

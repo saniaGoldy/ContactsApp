@@ -6,6 +6,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
 import androidx.annotation.RequiresPermission
+import com.example.contactsapp.placeholder.ContactsData
 
 /**
  * @author aminography
@@ -36,8 +37,8 @@ fun Context.retrieveAllContacts(
     retrieveAvatar: Boolean = true,
     limit: Int = -1,
     offset: Int = -1
-): List<ContactData> {
-    val result: MutableList<ContactData> = mutableListOf()
+): List<ContactsData.ContactData> {
+    val result: MutableList<ContactsData.ContactData> = mutableListOf()
     contentResolver.query(
         ContactsContract.Contacts.CONTENT_URI,
         CONTACT_PROJECTION,
@@ -56,7 +57,7 @@ fun Context.retrieveAllContacts(
                 } else mutableListOf()
 
                 val avatar = if (retrieveAvatar) retrieveAvatar(contactId) else null
-                result.add(ContactData(contactId, name, phoneNumber, avatar))
+                result.add(ContactsData.ContactData(contactId, name, phoneNumber, avatar))
             } while (it.moveToNext())
         }
     }
