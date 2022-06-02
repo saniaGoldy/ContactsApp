@@ -102,16 +102,10 @@ private fun Context.retrieveAvatar(contactId: Long): Uri? {
     }
 }
 
-private val CONTACT_PROJECTION = arrayOf(
+/*private val CONTACT_PROJECTION = arrayOf(
     ContactsContract.Contacts._ID,
     ContactsContract.Contacts.LOOKUP_KEY,
     ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
     ContactsContract.Contacts.HAS_PHONE_NUMBER
-)
+)*/
 
-data class ContactData(
-    val contactId: Long,
-    val name: String,
-    val phoneNumber: List<String>,
-    val avatar: Uri?
-)

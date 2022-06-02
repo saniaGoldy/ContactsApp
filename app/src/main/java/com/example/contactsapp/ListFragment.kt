@@ -83,7 +83,7 @@ class ListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>,
             // Sets the adapter for the ListView
             contactsList.adapter = cursorAdapter
             contactsList.descendantFocusability = ListView.FOCUS_BLOCK_DESCENDANTS
-            contactsList.setOnItemClickListener(this)
+            contactsList.onItemClickListener = this
 
             /*contactsList.onItemClickListener = OnItemClickListener { parent, view, position, id ->
                 val selectedItem = parent.getItemAtPosition(position) as String
