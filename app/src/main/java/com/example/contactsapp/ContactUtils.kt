@@ -6,7 +6,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
 import androidx.annotation.RequiresPermission
-import com.example.contactsapp.placeholder.ContactsData
+import com.example.contactsapp.model.ContactsData
 
 /**
  * @author aminography

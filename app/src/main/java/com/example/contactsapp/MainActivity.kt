@@ -11,7 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import com.example.contactsapp.placeholder.ContactsData
+import com.example.contactsapp.model.ContactsData
 
 
 val CONTACT_PROJECTION: Array<out String> = arrayOf(

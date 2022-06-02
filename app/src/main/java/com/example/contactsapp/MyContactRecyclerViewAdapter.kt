@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.contactsapp.databinding.FragmentContactItemBinding
-import com.example.contactsapp.placeholder.ContactsData
+import com.example.contactsapp.model.ContactsData
 
 class MyContactRecyclerViewAdapter(
     private val values: List<ContactsData.ContactData>
