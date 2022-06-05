@@ -76,16 +76,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        batteryStatus = IntentFilter(Intent.ACTION_POWER_CONNECTED).let { ifilter ->
+
+        batteryStatus = IntentFilter().let { ifilter ->
+            ifilter.addAction(Intent.ACTION_POWER_CONNECTED)
+            ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
+            ifilter.addAction(Intent.ACTION_BATTERY_CHANGED)
             this.registerReceiver(BatteryStatusReceiver(), ifilter)
         }
-
-        val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
-        val isCharging: Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
-                || status == BatteryManager.BATTERY_STATUS_FULL
-
-        findViewById<TextView>(R.id.tvBattery).text = if (isCharging) "Charging connected" else "Charging disconnected"
-
     }
 
     override fun onStop() {
@@ -97,13 +94,20 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val tvBatteryStatus = findViewById<TextView>(R.id.tvBattery)
             if (intent != null) {
-                if(intent.action == Intent.ACTION_POWER_CONNECTED){
-                    Log.d(TAG, "charger connected")
-                    tvBatteryStatus.text = "Charging connected"
-                }else if (intent.action == Intent.ACTION_POWER_DISCONNECTED){
-                    Log.d(TAG, "charger connected")
-                    tvBatteryStatus.text = "Charging disconnected"
-                }
+                val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)
+                tvBatteryStatus.text = if (status == BatteryManager.BATTERY_STATUS_NOT_CHARGING)
+                    "not charging"
+                else if (status == BatteryManager.BATTERY_STATUS_DISCHARGING)
+                    "discharging"
+                else if (status == BatteryManager.BATTERY_STATUS_CHARGING)
+                    "charging"
+                else if (status == BatteryManager.BATTERY_STATUS_FULL)
+                    "full"
+                else if (intent.action == Intent.ACTION_POWER_CONNECTED) {
+                    "Charging connected"
+                } else if (intent.action == Intent.ACTION_POWER_DISCONNECTED) {
+                    "Charging disconnected"
+                } else ""
             }
         }
     }
