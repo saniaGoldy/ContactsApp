@@ -1,6 +1,7 @@
 package com.example.contactsapp
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -8,6 +9,7 @@ import com.example.contactsapp.databinding.FragmentContactItemBinding
 import com.example.contactsapp.model.ContactsData
 
 class MyContactRecyclerViewAdapter(
+    private val mOnContactClickListener: OnContactClickListener,
     private val values: List<ContactsData.ContactData>
 ) : RecyclerView.Adapter<MyContactRecyclerViewAdapter.ViewHolder>() {
 
@@ -18,7 +20,8 @@ class MyContactRecyclerViewAdapter(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ),
+            mOnContactClickListener
         )
 
     }
@@ -26,19 +29,34 @@ class MyContactRecyclerViewAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
         holder.idView.text = item.name
-        holder.contentView.text = item.phoneNumber[0]
+        holder.contentView.text = if(item.phoneNumber.isNotEmpty()){ item.phoneNumber[0] } else "no phone"
     }
 
     override fun getItemCount(): Int = values.size
 
-    inner class ViewHolder(binding: FragmentContactItemBinding) :
+    inner class ViewHolder(
+        binding: FragmentContactItemBinding,
+        private val onContactClickListener: OnContactClickListener
+    ) : View.OnClickListener,
         RecyclerView.ViewHolder(binding.root) {
+
         val idView: TextView = binding.name
         val contentView: TextView = binding.number
 
-        override fun toString(): String {
-            return super.toString() + " '" + contentView.text + "'"
+
+        init {
+            idView.setOnClickListener(this)
+            contentView.setOnClickListener(this)
         }
+
+
+        override fun onClick(v: View?) {
+            onContactClickListener.onClick(bindingAdapterPosition)
+        }
+    }
+
+    interface OnContactClickListener {
+        fun onClick(position: Int)
     }
 
 }

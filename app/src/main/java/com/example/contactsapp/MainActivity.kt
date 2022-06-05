@@ -12,18 +12,26 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import com.example.contactsapp.model.ContactsData
+import contacts.core.Contacts
+import contacts.core.util.emailList
+import contacts.core.util.organizationList
+import contacts.core.util.phoneList
 
 
 val CONTACT_PROJECTION: Array<out String> = arrayOf(
     ContactsContract.Data._ID,
     ContactsContract.Contacts.LOOKUP_KEY,
     ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
-    ContactsContract.CommonDataKinds.Phone.NUMBER
+    ContactsContract.CommonDataKinds.Phone.NUMBER,
+    ContactsContract.CommonDataKinds.Organization.COMPANY,
+    ContactsContract.CommonDataKinds.Email.ADDRESS,
+    ContactsContract.Data.MIMETYPE
 )
 
 const val TAG = "MyApp"
 
 class MainActivity : AppCompatActivity() {
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -33,13 +41,24 @@ class MainActivity : AppCompatActivity() {
         if (!readContactsPermissionGranted()) {
             requestReadContactsPermission()
         }
+        val contactsData = mutableListOf<ContactsData.ContactData>()
+        val contacts = Contacts(this).query().find()
+        contacts.forEach { contact ->
+            contactsData.add(
+                ContactsData.ContactData(
+                    contact.id,
+                    contact.displayNamePrimary,
+                    contact.phoneList().map{ it.number ?: "no phone number" },
+                    contact.organizationList().map{ it.company ?: "no organization found" },
+                    contact.emailList().map{ it.address ?: "no email address found" }
+                    )
+            )
+        }
 
-        val contactsData = requestContacts()
         ContactsData.ITEMS.apply {
             this.clear()
             this.addAll(contactsData)
         }
-
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
@@ -47,35 +66,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun requestContacts(): MutableList<ContactsData.ContactData> {
-
-        val result: MutableList<ContactsData.ContactData> = mutableListOf()
-        contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null)
-            ?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    do {
-                        val contactId =
-                            cursor.getLong(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[0]))
-                        val name =
-                            cursor.getString(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[2]))
-                                ?: ""
-                        val phoneNumber =
-                            cursor.getString(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[3]))
-
-                        result.add(
-                            ContactsData.ContactData(
-                                contactId,
-                                name,
-                                listOf(phoneNumber),
-                                null
-                            ).also { Log.d(TAG, it.phoneNumber.toString()) })
-                    } while (cursor.moveToNext())
-                }
-            }
-        return result
     }
 
     private fun requestReadContactsPermission() {
