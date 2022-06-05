@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -26,7 +25,7 @@ import contacts.core.util.phoneList
 const val TAG = "MyApp"
 
 class MainActivity : AppCompatActivity() {
-    var batteryStatus: Intent? = null
+    private var batteryStatus: Intent? = null
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -95,19 +94,11 @@ class MainActivity : AppCompatActivity() {
             val tvBatteryStatus = findViewById<TextView>(R.id.tvBattery)
             if (intent != null) {
                 val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)
-                tvBatteryStatus.text = if (status == BatteryManager.BATTERY_STATUS_NOT_CHARGING)
-                    "not charging"
-                else if (status == BatteryManager.BATTERY_STATUS_DISCHARGING)
-                    "discharging"
-                else if (status == BatteryManager.BATTERY_STATUS_CHARGING)
-                    "charging"
-                else if (status == BatteryManager.BATTERY_STATUS_FULL)
-                    "full"
-                else if (intent.action == Intent.ACTION_POWER_CONNECTED) {
-                    "Charging connected"
-                } else if (intent.action == Intent.ACTION_POWER_DISCONNECTED) {
-                    "Charging disconnected"
-                } else ""
+                tvBatteryStatus.text = when (status) {
+                    BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Charging disconnected"
+                    BatteryManager.BATTERY_STATUS_CHARGING -> "Charging connected"
+                    else -> ""
+                }
             }
         }
     }

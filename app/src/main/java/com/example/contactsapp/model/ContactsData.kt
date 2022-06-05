@@ -1,8 +1,5 @@
 package com.example.contactsapp.model
 
-import contacts.core.Contacts
-import contacts.core.util.phoneList
-
 object ContactsData {
     val ITEMS: MutableList<ContactData> = ArrayList()
     var selectedItem: ContactData? = null
