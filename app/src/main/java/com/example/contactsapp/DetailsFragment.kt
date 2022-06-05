@@ -1,6 +1,8 @@
 package com.example.contactsapp
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -45,20 +47,31 @@ class DetailsFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity?.also {
-            it.findViewById<TextView>(R.id.contactName).text =
+        activity?.also { fragmentActivity ->
+            fragmentActivity.findViewById<TextView>(R.id.contactName).text =
                 ContactsData.selectedItem?.name ?: "Cant find a name"
 
-            it.findViewById<TextView>(R.id.contactPhone).apply {
-                text = if (ContactsData.selectedItem?.phoneNumber?.isNotEmpty() == true) {
-                    ContactsData.selectedItem?.phoneNumber?.get(0) ?: "no phone number"
-                } else "no phone"
+            fragmentActivity.findViewById<TextView>(R.id.contactPhone).apply {
+                var hasPhoneNumber = false
+                val noNumberLabel = "no phone number"
+                val phoneNumber = ContactsData.selectedItem?.let {
+                    if (ContactsData.selectedItem!!.phoneNumber.isNotEmpty()) {
+                        hasPhoneNumber = true
+                        ContactsData.selectedItem!!.phoneNumber[0]
+                    } else noNumberLabel
+                } ?: noNumberLabel
+                text = phoneNumber
+
                 setOnClickListener {
                     Log.d(TAG, "contactPhone clicked")
+                    Intent(Intent.ACTION_DIAL).also {
+                        it.data = Uri.parse("tel:${if (hasPhoneNumber) phoneNumber else ""}")
+                        startActivity(it)
+                    }
                 }
             }
 
-            it.findViewById<TextView>(R.id.contactOrganization).text =
+            fragmentActivity.findViewById<TextView>(R.id.contactOrganization).text =
                 "Organization name: ${
                     if (ContactsData.selectedItem?.organization?.isNotEmpty() == true) {
                         ContactsData.selectedItem?.organization!![0]
@@ -67,14 +80,26 @@ class DetailsFragment : Fragment() {
                     }
                 }"
 
-            it.findViewById<TextView>(R.id.contactEmail).text =
-                "Email: ${
-                    if (ContactsData.selectedItem?.email?.isNotEmpty() == true) {
-                        ContactsData.selectedItem?.email!![0]
-                    } else {
-                        "no email"
+            fragmentActivity.findViewById<TextView>(R.id.contactEmail).apply {
+                var hasEmail = false
+                val noEmailLabel = "no email"
+                val email = ContactsData.selectedItem?.let {
+                    if (ContactsData.selectedItem!!.email.isNotEmpty()) {
+                        hasEmail = true
+                        ContactsData.selectedItem!!.email[0]
+                    } else noEmailLabel
+                } ?: noEmailLabel
+                text = email
+
+                setOnClickListener {
+                    Log.d(TAG, "email clicked")
+                    Intent(Intent.ACTION_SENDTO).also {
+                        it.data = Uri.parse("mailto:${if (hasEmail) email else ""}")
+                        startActivity(it)
                     }
-                }"
+                }
+
+            }
         }
     }
 
