@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.os.*
@@ -15,6 +16,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
+import contacts.core.Contacts
+import contacts.core.util.emailList
+import contacts.core.util.organizationList
+import contacts.core.util.phoneList
 
 
 const val TAG = "MyApp"
@@ -28,6 +33,7 @@ val CONTACT_PROJECTION: Array<out String> = arrayOf(
 
 class MainActivity : AppCompatActivity() {
     private var batteryStatus: Intent? = null
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -37,26 +43,23 @@ class MainActivity : AppCompatActivity() {
         if (!readContactsPermissionGranted()) {
             requestReadContactsPermission()
         }
-        /*val contactsData = mutableListOf<ContactsData.ContactData>()
-        val contacts = Contacts(this).query().find()
-        contacts.forEach { contact ->
-            contactsData.add(
-                ContactsData.ContactData(
+
+        val contacts = requestContacts()
+        /*
+        //this one works so much better
+        val contacts:MutableList<ContactData> = mutableListOf()
+        Contacts(this).query().find().forEach {  contact ->
+            val org = contact.organizationList()
+            contacts.add(
+                ContactData(
                     contact.id,
                     contact.displayNamePrimary,
-                    contact.phoneList().map { it.number ?: "no phone number" },
-                    contact.organizationList().map { it.company ?: "no organization found" },
-                    contact.emailList().map { it.address ?: "no email address found" }
+                    contact.phoneList().map { it.number ?: "no phone number" } as ArrayList<String> *//* = java.util.ArrayList<kotlin.String> *//*,
+                    if(org.isNotEmpty()){org[0].company} else {null},
+                    contact.emailList().map { it.address ?: "no email address found" } as ArrayList<String>
                 )
-            )
-        }
-
-        ContactsData.ITEMS.apply {
-            this.clear()
-            this.addAll(contactsData)
-        }*/
-        val contacts = requestContacts()
-
+            ) }
+        */
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
@@ -78,33 +81,38 @@ class MainActivity : AppCompatActivity() {
         Manifest.permission.READ_CONTACTS
     ) == PackageManager.PERMISSION_GRANTED
 
-    /*override fun onStart() {
+    override fun onStart() {
         super.onStart()
 
         batteryStatus = IntentFilter().let { ifilter ->
             ifilter.addAction(Intent.ACTION_POWER_CONNECTED)
             ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
             ifilter.addAction(Intent.ACTION_BATTERY_CHANGED)
-            this.registerReceiver(BatteryStatusReceiver(), ifilter)
+            registerReceiver(BatteryStatusReceiver(), ifilter)
         }
     }
 
     override fun onStop() {
         super.onStop()
         this.unregisterReceiver(BatteryStatusReceiver())
-    }*/
-
-
+    }
 
     inner class BatteryStatusReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            val tvBatteryStatus = findViewById<TextView>(R.id.tvBattery)
-            if (intent != null) {
-                val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)
-                tvBatteryStatus.text = when (status) {
-                    BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Charging disconnected"
-                    BatteryManager.BATTERY_STATUS_CHARGING -> "Charging connected"
-                    else -> ""
+
+            this@MainActivity.apply {
+                val tvBatteryStatus = findViewById<TextView>(R.id.tvBattery)
+                if (intent != null) {
+                    val status = intent.getIntExtra(
+                        BatteryManager.EXTRA_STATUS,
+                        BatteryManager.BATTERY_STATUS_UNKNOWN
+                    )
+                    Log.d(TAG, "onReceive: battery status is $status")
+                    tvBatteryStatus.text = when (status) {
+                        BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Charging disconnected"
+                        BatteryManager.BATTERY_STATUS_CHARGING -> "Charging connected"
+                        else -> "battery status"
+                    }
                 }
             }
         }
@@ -170,7 +178,7 @@ class MainActivity : AppCompatActivity() {
                             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                             ContactsContract.CommonDataKinds.Phone.NUMBER
                         )
-                        val emails= requestContactDetail(
+                        val emails = requestContactDetail(
                             contactId,
                             ContactsContract.CommonDataKinds.Email.CONTENT_URI,
                             ContactsContract.CommonDataKinds.Email.ADDRESS

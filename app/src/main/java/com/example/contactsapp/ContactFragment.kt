@@ -1,12 +1,17 @@
 package com.example.contactsapp
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -51,6 +56,23 @@ class ContactFragment : Fragment(), MyContactRecyclerViewAdapter.OnContactClickL
             adapter = MyContactRecyclerViewAdapter(this@ContactFragment, contacts)
         }
     }
+
+    /*override fun onStart() {
+        super.onStart()
+        requireActivity().apply {
+            IntentFilter().let { ifilter ->
+                ifilter.addAction(Intent.ACTION_POWER_CONNECTED)
+                ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
+                ifilter.addAction(Intent.ACTION_BATTERY_CHANGED)
+                registerReceiver(BatteryStatusReceiver(), ifilter)
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        requireActivity().unregisterReceiver(BatteryStatusReceiver())
+    }*/
 
     override fun onClick(position: Int) {
 
