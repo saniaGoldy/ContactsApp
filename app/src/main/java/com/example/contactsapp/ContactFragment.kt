@@ -1,17 +1,12 @@
 package com.example.contactsapp
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -22,12 +17,12 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ContactFragment : Fragment(), MyContactRecyclerViewAdapter.OnContactClickListener {
     private var columnCount = 1
-    private val contacts: MutableList<MainActivity.ContactData> = mutableListOf()
+    private val contacts: MutableList<ContactData> = mutableListOf()
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val data = requireArguments().get("data")
         if (data is MutableList<*>) {
-            contacts.addAll(data as MutableList<MainActivity.ContactData>)
+            contacts.addAll(data as MutableList<ContactData>)
         }
     }
 

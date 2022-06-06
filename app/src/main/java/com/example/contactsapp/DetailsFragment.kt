@@ -23,9 +23,9 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var contact: MainActivity.ContactData? = null
+        var contact: ContactData? = null
         if (arguments != null) {
-            contact = requireArguments().get("details") as MainActivity.ContactData?
+            contact = requireArguments().get("details") as ContactData?
             Log.d(TAG, "detailsFragment: $contact")
         }else{
             Log.d(TAG, "detailsFragment: Bundle is null")

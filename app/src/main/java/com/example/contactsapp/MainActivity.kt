@@ -16,10 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
-import contacts.core.Contacts
-import contacts.core.util.emailList
-import contacts.core.util.organizationList
-import contacts.core.util.phoneList
 
 
 const val TAG = "MyApp"
@@ -115,41 +111,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
-    }
-
-    data class ContactData(
-        val contactId: Long,
-        val name: String?,
-        val phoneNumber: ArrayList<String>?,
-        val organization: String?,
-        val email: ArrayList<String>?
-    ) : Parcelable {
-        constructor(source: Parcel) : this(
-            source.readLong(),
-            source.readString(),
-            source.createStringArrayList(),
-            source.readString(),
-            source.createStringArrayList()
-        )
-
-        override fun describeContents() = 0
-
-        override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
-            writeLong(contactId)
-            writeString(name)
-            writeStringList(phoneNumber)
-            writeString(organization)
-            writeStringList(email)
-        }
-
-        companion object {
-            @JvmField
-            val CREATOR: Parcelable.Creator<ContactData> =
-                object : Parcelable.Creator<ContactData> {
-                    override fun createFromParcel(source: Parcel): ContactData = ContactData(source)
-                    override fun newArray(size: Int): Array<ContactData?> = arrayOfNulls(size)
-                }
         }
     }
 

@@ -9,7 +9,7 @@ import com.example.contactsapp.databinding.FragmentContactItemBinding
 
 class MyContactRecyclerViewAdapter(
     private val mOnContactClickListener: OnContactClickListener,
-    private val values: List<MainActivity.ContactData>
+    private val values: List<ContactData>
 ) : RecyclerView.Adapter<MyContactRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
