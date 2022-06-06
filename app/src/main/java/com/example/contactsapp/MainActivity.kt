@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        batteryStatus = IntentFilter().let { ifilter ->
+        IntentFilter().let { ifilter ->
             ifilter.addAction(Intent.ACTION_POWER_CONNECTED)
             ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
             ifilter.addAction(Intent.ACTION_BATTERY_CHANGED)

@@ -26,11 +26,7 @@ class MyContactRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
-        val text = item.name + " : " + if (item.phoneNumber?.isNotEmpty() == true) {
-            item.phoneNumber[0]
-        } else "no phone"
-        holder.idView.text = text
+        holder.bind(position)
     }
 
     override fun getItemCount(): Int = values.size
@@ -48,6 +44,13 @@ class MyContactRecyclerViewAdapter(
             idView.setOnClickListener(this)
         }
 
+        fun bind(position: Int){
+            val item = values[position]
+            val text = item.name + " : " + if (item.phoneNumber?.isNotEmpty() == true) {
+                item.phoneNumber[0]
+            } else "no phone"
+            idView.text = text
+        }
 
         override fun onClick(v: View?) {
             onContactClickListener.onClick(bindingAdapterPosition)
