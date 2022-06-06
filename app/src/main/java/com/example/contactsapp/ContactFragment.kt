@@ -16,10 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 
 class ContactFragment : Fragment(), MyContactRecyclerViewAdapter.OnContactClickListener {
-
     private var columnCount = 1
     private val contacts: MutableList<MainActivity.ContactData> = mutableListOf()
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val data = requireArguments().get("data")
@@ -35,17 +33,23 @@ class ContactFragment : Fragment(), MyContactRecyclerViewAdapter.OnContactClickL
     ): View? {
         val view = inflater.inflate(R.layout.fragment_contact_item_list, container, false)
 
-        // Set the adapter
-        if (view is RecyclerView) {
-            with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter = MyContactRecyclerViewAdapter(this@ContactFragment, contacts)
-            }
-        }
+
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        var recyclerView: RecyclerView
+        requireActivity().apply {
+            recyclerView = this.findViewById(R.id.list)
+        }
+        recyclerView.apply {
+            layoutManager = when {
+                columnCount <= 1 -> LinearLayoutManager(context)
+                else -> GridLayoutManager(context, columnCount)
+            }
+            adapter = MyContactRecyclerViewAdapter(this@ContactFragment, contacts)
+        }
     }
 
     override fun onClick(position: Int) {
