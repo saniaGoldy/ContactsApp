@@ -8,7 +8,7 @@
 
     <TextView
         android:id="@+id/contactName"
-        android:layout_width="407dp"
+        android:layout_width="match_parent"
         android:layout_height="56dp"
         android:text="@android:string/unknownName"
         android:textAlignment="center"
@@ -22,7 +22,7 @@
 
     <TextView
         android:id="@+id/contactPhone"
-        android:layout_width="409dp"
+        android:layout_width="match_parent"
         android:layout_height="30dp"
         android:text="@android:string/emptyPhoneNumber"
         android:textAlignment="center"
@@ -33,7 +33,7 @@
 
     <TextView
         android:id="@+id/contactOrganization"
-        android:layout_width="409dp"
+        android:layout_width="match_parent"
         android:layout_height="42dp"
         android:layout_marginTop="140dp"
         android:text="@android:string/paste_as_plain_text"
@@ -48,7 +48,7 @@
 
     <TextView
         android:id="@+id/contactEmail"
-        android:layout_width="409dp"
+        android:layout_width="match_parent"
         android:layout_height="47dp"
         android:layout_marginTop="140dp"
         android:text="@android:string/defaultVoiceMailAlphaTag"

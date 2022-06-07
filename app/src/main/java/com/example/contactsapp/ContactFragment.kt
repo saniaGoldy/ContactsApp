@@ -1,48 +1,91 @@
 package com.example.contactsapp
 
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import com.example.contactsapp.model.ContactsData
 
 
 class ContactFragment : Fragment(), MyContactRecyclerViewAdapter.OnContactClickListener {
-
     private var columnCount = 1
+    private val contacts: MutableList<ContactData> = mutableListOf()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val data = requireArguments().get("data")
+        if (data is MutableList<*>) {
+            contacts.addAll(data as MutableList<ContactData>)
+        }
+    }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_contact_item_list, container, false)
 
-        // Set the adapter
-        if (view is RecyclerView) {
-            with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter = MyContactRecyclerViewAdapter(this@ContactFragment, ContactsData.ITEMS)
-            }
-        }
+
         return view
     }
 
-    override fun onClick(position: Int) {
-
-        val contact = ContactsData.ITEMS[position]
-        Log.d(TAG, "onClick: $contact")
-        ContactsData.selectedItem = contact
-        activity?.supportFragmentManager?.beginTransaction()
-            ?.replace(R.id.fragmentContainerView, DetailsFragment())?.addToBackStack(null)?.commit()
+    override fun onResume() {
+        super.onResume()
+        var recyclerView: RecyclerView
+        requireActivity().apply {
+            recyclerView = this.findViewById(R.id.list)
+        }
+        recyclerView.apply {
+            layoutManager = when {
+                columnCount <= 1 -> LinearLayoutManager(context)
+                else -> GridLayoutManager(context, columnCount)
+            }
+            adapter = MyContactRecyclerViewAdapter(this@ContactFragment, contacts)
+        }
     }
 
+    /*override fun onStart() {
+        super.onStart()
+        requireActivity().apply {
+            IntentFilter().let { ifilter ->
+                ifilter.addAction(Intent.ACTION_POWER_CONNECTED)
+                ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
+                ifilter.addAction(Intent.ACTION_BATTERY_CHANGED)
+                registerReceiver(BatteryStatusReceiver(), ifilter)
+            }
+        }
+    }
 
+    override fun onStop() {
+        super.onStop()
+        requireActivity().unregisterReceiver(BatteryStatusReceiver())
+    }*/
+
+    override fun onClick(position: Int) {
+
+        val contact = contacts[position]
+        Log.d(TAG, "onClick: $contact")
+
+        val detailsFragment = DetailsFragment.newInstance(contact)
+
+        activity?.supportFragmentManager?.beginTransaction()
+            ?.replace(R.id.fragmentContainerView, detailsFragment)?.addToBackStack(null)?.commit()
+    }
+
+    companion object {
+        fun newInstance(contacts: MutableList<ContactData>): ContactFragment {
+            val myFragment = ContactFragment()
+            val args = bundleOf("data" to contacts)
+            myFragment.arguments = args
+            return myFragment
+        }
+    }
 }

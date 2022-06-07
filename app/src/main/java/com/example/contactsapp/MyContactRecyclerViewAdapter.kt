@@ -6,11 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.contactsapp.databinding.FragmentContactItemBinding
-import com.example.contactsapp.model.ContactsData
 
 class MyContactRecyclerViewAdapter(
     private val mOnContactClickListener: OnContactClickListener,
-    private val values: List<ContactsData.ContactData>
+    private val values: List<ContactData>
 ) : RecyclerView.Adapter<MyContactRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,9 +26,7 @@ class MyContactRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
-        holder.idView.text = item.name
-        holder.contentView.text = if(item.phoneNumber.isNotEmpty()){ item.phoneNumber[0] } else "no phone"
+        holder.bind(position)
     }
 
     override fun getItemCount(): Int = values.size
@@ -41,14 +38,19 @@ class MyContactRecyclerViewAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         val idView: TextView = binding.name
-        val contentView: TextView = binding.number
 
 
         init {
             idView.setOnClickListener(this)
-            contentView.setOnClickListener(this)
         }
 
+        fun bind(position: Int){
+            val item = values[position]
+            val text = item.name + " : " + if (item.phoneNumber?.isNotEmpty() == true) {
+                item.phoneNumber[0]
+            } else "no phone"
+            idView.text = text
+        }
 
         override fun onClick(v: View?) {
             onContactClickListener.onClick(bindingAdapterPosition)
@@ -58,5 +60,6 @@ class MyContactRecyclerViewAdapter(
     interface OnContactClickListener {
         fun onClick(position: Int)
     }
+
 
 }

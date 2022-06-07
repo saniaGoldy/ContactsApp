@@ -8,8 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import com.example.contactsapp.model.ContactsData
 
 
 class DetailsFragment : Fragment() {
@@ -24,17 +24,24 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        var contact: ContactData? = null
+        if (arguments != null) {
+            contact = requireArguments().get("details") as ContactData?
+            Log.d(TAG, "detailsFragment: $contact")
+        }else{
+            Log.d(TAG, "detailsFragment: Bundle is null")
+        }
         activity?.also { fragmentActivity ->
             fragmentActivity.findViewById<TextView>(R.id.contactName).text =
-                ContactsData.selectedItem?.name ?: "Cant find a name"
+                contact?.name ?: "Cant find a name"
 
             fragmentActivity.findViewById<TextView>(R.id.contactPhone).apply {
                 var hasPhoneNumber = false
                 val noNumberLabel = "no phone number"
-                val phoneNumber = ContactsData.selectedItem?.let {
-                    if (ContactsData.selectedItem!!.phoneNumber.isNotEmpty()) {
+                val phoneNumber = contact?.let {
+                    if (contact.phoneNumber?.isNotEmpty() == true) {
                         hasPhoneNumber = true
-                        ContactsData.selectedItem!!.phoneNumber[0]
+                        contact.phoneNumber!![0]
                     } else noNumberLabel
                 } ?: noNumberLabel
                 text = phoneNumber
@@ -52,8 +59,8 @@ class DetailsFragment : Fragment() {
                 buildString {
                     append("Organization name: ")
                     append(
-                        if (ContactsData.selectedItem?.organization?.isNotEmpty() == true) {
-                            ContactsData.selectedItem?.organization!![0]
+                        if (contact?.organization?.isNotEmpty() == true) {
+                            contact.organization
                         } else {
                             "no organization"
                         }
@@ -63,12 +70,12 @@ class DetailsFragment : Fragment() {
             fragmentActivity.findViewById<TextView>(R.id.contactEmail).apply {
                 var hasEmail = false
                 val noEmailLabel = "no email"
-                val email = ContactsData.selectedItem?.let {
-                    if (ContactsData.selectedItem!!.email.isNotEmpty()) {
+                val email = contact.let {
+                    if (contact?.email?.isNotEmpty() == true) {
                         hasEmail = true
-                        ContactsData.selectedItem!!.email[0]
+                        contact.email!![0]
                     } else noEmailLabel
-                } ?: noEmailLabel
+                }
                 text = email
 
                 setOnClickListener {
@@ -78,8 +85,16 @@ class DetailsFragment : Fragment() {
                         startActivity(it)
                     }
                 }
-
             }
+        }
+    }
+
+    companion object{
+        fun newInstance(contact: ContactData): DetailsFragment {
+            val myFragment = DetailsFragment()
+            val args = bundleOf("details" to contact)
+            myFragment.arguments = args
+            return myFragment
         }
     }
 }
