@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 
 
@@ -84,8 +85,16 @@ class DetailsFragment : Fragment() {
                         startActivity(it)
                     }
                 }
-
             }
+        }
+    }
+
+    companion object{
+        fun newInstance(contact: ContactData): DetailsFragment {
+            val myFragment = DetailsFragment()
+            val args = bundleOf("details" to contact)
+            myFragment.arguments = args
+            return myFragment
         }
     }
 }

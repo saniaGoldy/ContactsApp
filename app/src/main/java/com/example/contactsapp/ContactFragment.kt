@@ -74,9 +74,7 @@ class ContactFragment : Fragment(), MyContactRecyclerViewAdapter.OnContactClickL
         val contact = contacts[position]
         Log.d(TAG, "onClick: $contact")
 
-        val detailsFragment = DetailsFragment()
-        val contactData = bundleOf("details" to contact)
-        detailsFragment.arguments = contactData
+        val detailsFragment = DetailsFragment.newInstance(contact)
 
         activity?.supportFragmentManager?.beginTransaction()
             ?.replace(R.id.fragmentContainerView, detailsFragment)?.addToBackStack(null)?.commit()
