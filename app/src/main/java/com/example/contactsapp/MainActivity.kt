@@ -41,21 +41,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         val contacts = requestContacts()
-        /*
-        //this one works so much better
-        val contacts:MutableList<ContactData> = mutableListOf()
-        Contacts(this).query().find().forEach {  contact ->
-            val org = contact.organizationList()
-            contacts.add(
-                ContactData(
-                    contact.id,
-                    contact.displayNamePrimary,
-                    contact.phoneList().map { it.number ?: "no phone number" } as ArrayList<String> *//* = java.util.ArrayList<kotlin.String> *//*,
-                    if(org.isNotEmpty()){org[0].company} else {null},
-                    contact.emailList().map { it.address ?: "no email address found" } as ArrayList<String>
-                )
-            ) }
-        */
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
