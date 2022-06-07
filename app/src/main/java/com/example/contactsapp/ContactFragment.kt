@@ -82,5 +82,12 @@ class ContactFragment : Fragment(), MyContactRecyclerViewAdapter.OnContactClickL
             ?.replace(R.id.fragmentContainerView, detailsFragment)?.addToBackStack(null)?.commit()
     }
 
-
+    companion object {
+        fun newInstance(contacts: MutableList<ContactData>): ContactFragment {
+            val myFragment = ContactFragment()
+            val args = bundleOf("data" to contacts)
+            myFragment.arguments = args
+            return myFragment
+        }
+    }
 }

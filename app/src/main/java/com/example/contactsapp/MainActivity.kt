@@ -59,8 +59,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                val contactsFragment = ContactFragment()
-                contactsFragment.arguments = bundleOf("data" to contacts)
+                val contactsFragment = ContactFragment.newInstance(contacts)
                 replace(R.id.fragmentContainerView, contactsFragment)
             }
         }
