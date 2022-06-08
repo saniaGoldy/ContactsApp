@@ -76,8 +76,8 @@ class ContactFragment : Fragment(), MyContactRecyclerViewAdapter.OnContactClickL
 
         val detailsFragment = DetailsFragment.newInstance(contact)
 
-        activity?.supportFragmentManager?.beginTransaction()
-            ?.replace(R.id.fragmentContainerView, detailsFragment)?.addToBackStack(null)?.commit()
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainerView, detailsFragment).addToBackStack(null).commit()
     }
 
     companion object {

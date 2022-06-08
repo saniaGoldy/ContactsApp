@@ -28,7 +28,6 @@ val CONTACT_PROJECTION: Array<out String> = arrayOf(
 )
 
 class MainActivity : AppCompatActivity() {
-    private var batteryStatus: Intent? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
