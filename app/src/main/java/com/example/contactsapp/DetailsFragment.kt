@@ -31,7 +31,11 @@ class DetailsFragment : Fragment() {
         }else{
             Log.d(TAG, "detailsFragment: Bundle is null")
         }
-        view.also { rootView ->
+        view.setDataToUI(contact)
+    }
+
+    private fun View.setDataToUI(contact: ContactData?) {
+        this.also { rootView ->
             rootView.findViewById<TextView>(R.id.contactName).text =
                 contact?.name ?: "Cant find a name"
 
@@ -41,7 +45,7 @@ class DetailsFragment : Fragment() {
                 val phoneNumber = contact?.let {
                     if (contact.phoneNumber?.isNotEmpty() == true) {
                         hasPhoneNumber = true
-                        contact.phoneNumber!![0]
+                        contact.phoneNumber[0]
                     } else noNumberLabel
                 } ?: noNumberLabel
                 text = phoneNumber
@@ -73,7 +77,7 @@ class DetailsFragment : Fragment() {
                 val email = contact.let {
                     if (contact?.email?.isNotEmpty() == true) {
                         hasEmail = true
-                        contact.email!![0]
+                        contact.email[0]
                     } else noEmailLabel
                 }
                 text = email
