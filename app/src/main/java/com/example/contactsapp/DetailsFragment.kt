@@ -31,11 +31,11 @@ class DetailsFragment : Fragment() {
         }else{
             Log.d(TAG, "detailsFragment: Bundle is null")
         }
-        activity?.also { fragmentActivity ->
-            fragmentActivity.findViewById<TextView>(R.id.contactName).text =
+        view.also { rootView ->
+            rootView.findViewById<TextView>(R.id.contactName).text =
                 contact?.name ?: "Cant find a name"
 
-            fragmentActivity.findViewById<TextView>(R.id.contactPhone).apply {
+            rootView.findViewById<TextView>(R.id.contactPhone).apply {
                 var hasPhoneNumber = false
                 val noNumberLabel = "no phone number"
                 val phoneNumber = contact?.let {
@@ -55,7 +55,7 @@ class DetailsFragment : Fragment() {
                 }
             }
 
-            fragmentActivity.findViewById<TextView>(R.id.contactOrganization).text =
+            rootView.findViewById<TextView>(R.id.contactOrganization).text =
                 buildString {
                     append("Organization name: ")
                     append(
@@ -67,7 +67,7 @@ class DetailsFragment : Fragment() {
                     )
                 }
 
-            fragmentActivity.findViewById<TextView>(R.id.contactEmail).apply {
+            rootView.findViewById<TextView>(R.id.contactEmail).apply {
                 var hasEmail = false
                 val noEmailLabel = "no email"
                 val email = contact.let {
