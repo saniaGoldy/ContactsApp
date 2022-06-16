@@ -17,6 +17,11 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.sendBlocking
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.*
+import kotlin.math.log
 
 
 const val TAG = "MyApp"
@@ -40,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             requestReadContactsPermission()
         }
 
-        val contacts = requestContacts()
+        val contacts = mutableListOf<ContactData>()
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
@@ -64,40 +69,41 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        IntentFilter().let { ifilter ->
-            ifilter.addAction(Intent.ACTION_POWER_CONNECTED)
-            ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
-            ifilter.addAction(Intent.ACTION_BATTERY_CHANGED)
-            registerReceiver(BatteryStatusReceiver(), ifilter)
-        }
+        flow().onEach { Log.d(TAG, "battery status update")
+        findViewById<TextView>(R.id.tvBattery).text = it
+        }.launchIn(lifecycleScope)
+
     }
 
-    override fun onStop() {
-        super.onStop()
-        this.unregisterReceiver(BatteryStatusReceiver())
-    }
-
-    inner class BatteryStatusReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-
-            this@MainActivity.apply {
-                val tvBatteryStatus = findViewById<TextView>(R.id.tvBattery)
+    private fun flow(): Flow<String> = callbackFlow {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent != null) {
                     val status = intent.getIntExtra(
                         BatteryManager.EXTRA_STATUS,
                         BatteryManager.BATTERY_STATUS_UNKNOWN
                     )
                     Log.d(TAG, "onReceive: battery status is $status")
-                    tvBatteryStatus.text = when (status) {
-                        BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Charging disconnected"
-                        BatteryManager.BATTERY_STATUS_CHARGING -> "Charging connected"
-                        else -> "battery status"
-                    }
+                    trySend(
+                        when (status) {
+                            BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Charging disconnected"
+                            BatteryManager.BATTERY_STATUS_CHARGING -> "Charging connected"
+                            else -> "battery status"
+                        }
+                    ).isSuccess
                 }
             }
         }
+        IntentFilter().let { ifilter ->
+            ifilter.addAction(Intent.ACTION_POWER_CONNECTED)
+            ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
+            ifilter.addAction(Intent.ACTION_BATTERY_CHANGED)
+            this@MainActivity.registerReceiver(receiver, ifilter)
+        }
+        awaitClose {
+            this@MainActivity.unregisterReceiver(receiver)
+        }
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun requestContacts(): MutableList<ContactData> {
