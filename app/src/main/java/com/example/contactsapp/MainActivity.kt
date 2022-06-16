@@ -14,8 +14,9 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.*
 
 
 const val TAG = "MyApp"
@@ -100,81 +101,86 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun requestContacts(): MutableList<ContactData> {
-
         val result: MutableList<ContactData> = mutableListOf()
 
-        this.contentResolver.query(
-            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-            null,
-            null,
-            null
-        )
-            ?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    do {
-                        val contactId =
-                            cursor.getLong(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[0]))
-                        val name =
-                            cursor.getString(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[2]))
-                                ?: ""
-                        val phones = requestContactDetail(
-                            contactId,
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            ContactsContract.CommonDataKinds.Phone.NUMBER
-                        )
-                        val emails = requestContactDetail(
-                            contactId,
-                            ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-                            ContactsContract.CommonDataKinds.Email.ADDRESS
-                        )
-                        val rawContactId = getRawContactId(contactId.toString())
-                        val companyName = getCompanyName(rawContactId!!) ?: ""
-
-
-
-                        result.add(
-                            ContactData(
+        runBlocking {
+            this@MainActivity.contentResolver.query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                null,
+                null,
+                null
+            )
+                ?.also { cursor ->
+                    if (cursor.moveToFirst()) {
+                        do {
+                            val contactId =
+                                cursor.getLong(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[0]))
+                            Log.d(TAG, "requestContacts: contact $contactId request")
+                            val name =
+                                cursor.getString(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[2]))
+                                    ?: ""
+                            val phones = requestContactDetail(
                                 contactId,
-                                name,
-                                phones,
-                                companyName,
-                                emails
-                            ).also { Log.d(TAG, it.phoneNumber.toString()) })
+                                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                ContactsContract.CommonDataKinds.Phone.NUMBER
+                            )
+                            val emails = requestContactDetail(
+                                contactId,
+                                ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                                ContactsContract.CommonDataKinds.Email.ADDRESS
+                            )
+                            val rawContactId = getRawContactId(contactId.toString())
+                            val companyName = getCompanyName(rawContactId!!) ?: ""
 
-                    } while (cursor.moveToNext())
+
+
+                            result.add(
+                                ContactData(
+                                    contactId,
+                                    name,
+                                    arrayListOf(phones),
+                                    companyName,
+                                    arrayListOf(emails)
+                                ).also { Log.d(TAG, it.phoneNumber.toString()) })
+
+                        } while (cursor.moveToNext())
+                    }
                 }
-            }
 
+
+        }
         return result
     }
 
-    private fun requestContactDetail(
+    private suspend fun requestContactDetail(
         contactId: Long,
         uri: android.net.Uri,
         columnName: String
-    ): ArrayList<String> {
-
-        val result = arrayListOf<String>()
-        contentResolver.query(
-            uri,
-            null,
-            "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} =?",
-            arrayOf(contactId.toString()),
-            null
-        )?.use { contactDetailsCursor ->
-            if (contactDetailsCursor.moveToFirst()) {
-                do {
-                    result.add(
+    ): String {
+        return withContext(lifecycleScope.coroutineContext + Dispatchers.IO) {
+            var string = "Can`t get details"
+            contentResolver.query(
+                uri,
+                null,
+                "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} =?",
+                arrayOf(contactId.toString()),
+                null
+            )?.also { contactDetailsCursor ->
+                if (contactDetailsCursor.moveToFirst()) {
+                    string =
                         contactDetailsCursor.getString(
                             contactDetailsCursor.getColumnIndexOrThrow(
                                 columnName
                             )
-                        ).also { Log.d(TAG, "$contactId data: $it") }
-                    )
-                } while (contactDetailsCursor.moveToNext())
+                        ).also {
+                            Log.d(TAG, "$contactId data: $it")
+                            contactDetailsCursor.close()
+                        }
+
+                }
             }
+            string
         }
-        return result
     }
 
     private fun getRawContactId(contactId: String): String? {
