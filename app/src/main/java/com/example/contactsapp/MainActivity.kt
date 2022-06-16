@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             requestReadContactsPermission()
         }
 
-        val contacts = mutableListOf<ContactData>()
+        val contacts = requestContacts()
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
