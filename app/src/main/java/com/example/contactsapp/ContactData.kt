@@ -6,16 +6,16 @@ import android.os.Parcelable
 data class ContactData(
     val contactId: Long,
     val name: String?,
-    val phoneNumber: ArrayList<String>?,
+    val phoneNumber: String?,
     val organization: String?,
-    val email: ArrayList<String>?
+    val email: String?
 ) : Parcelable {
     constructor(source: Parcel) : this(
         source.readLong(),
         source.readString(),
-        source.createStringArrayList(),
         source.readString(),
-        source.createStringArrayList()
+        source.readString(),
+        source.readString()
     )
 
     override fun describeContents() = 0
@@ -23,9 +23,9 @@ data class ContactData(
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
         writeLong(contactId)
         writeString(name)
-        writeStringList(phoneNumber)
+        writeString(phoneNumber)
         writeString(organization)
-        writeStringList(email)
+        writeString(email)
     }
 
     companion object {

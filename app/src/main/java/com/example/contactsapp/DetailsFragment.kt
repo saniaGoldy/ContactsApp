@@ -45,7 +45,7 @@ class DetailsFragment : Fragment() {
                 val phoneNumber = contact?.let {
                     if (contact.phoneNumber?.isNotEmpty() == true) {
                         hasPhoneNumber = true
-                        contact.phoneNumber[0]
+                        contact.phoneNumber
                     } else noNumberLabel
                 } ?: noNumberLabel
                 text = phoneNumber
@@ -77,7 +77,7 @@ class DetailsFragment : Fragment() {
                 val email = contact.let {
                     if (contact?.email?.isNotEmpty() == true) {
                         hasEmail = true
-                        contact.email[0]
+                        contact.email
                     } else noEmailLabel
                 }
                 text = email

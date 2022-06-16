@@ -18,10 +18,7 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.sendBlocking
-import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.*
-import kotlin.math.log
 
 
 const val TAG = "MyApp"
@@ -125,12 +122,12 @@ class MainActivity : AppCompatActivity() {
                             val name =
                                 cursor.getString(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[2]))
                                     ?: ""
-                            val phones = requestContactDetail(
+                            val phone = requestContactDetail(
                                 contactId,
                                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                                 ContactsContract.CommonDataKinds.Phone.NUMBER
                             )
-                            val emails = requestContactDetail(
+                            val email = requestContactDetail(
                                 contactId,
                                 ContactsContract.CommonDataKinds.Email.CONTENT_URI,
                                 ContactsContract.CommonDataKinds.Email.ADDRESS
@@ -144,9 +141,9 @@ class MainActivity : AppCompatActivity() {
                                 ContactData(
                                     contactId,
                                     name,
-                                    arrayListOf(phones),
+                                    phone,
                                     companyName,
-                                    arrayListOf(emails)
+                                    email
                                 ).also { Log.d(TAG, it.phoneNumber.toString()) })
 
                         } while (cursor.moveToNext())

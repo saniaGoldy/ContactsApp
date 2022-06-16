@@ -46,7 +46,7 @@ class MyContactRecyclerViewAdapter(
 
         fun bind(item: ContactData){
             val text = item.name + " : " + if (item.phoneNumber?.isNotEmpty() == true) {
-                item.phoneNumber[0]
+                item.phoneNumber
             } else "no phone"
             idView.text = text
         }
