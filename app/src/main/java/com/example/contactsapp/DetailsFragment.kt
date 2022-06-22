@@ -1,7 +1,6 @@
 package com.example.contactsapp
 
 import android.content.Intent
-import android.media.MediaDrm
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -114,11 +113,7 @@ class DetailsFragment : Fragment() {
 
     companion object {
         const val BundleTag = "details"
-        fun newInstance(contact: ContactData): DetailsFragment {
-            val myFragment = DetailsFragment()
-            val args = bundleOf(BundleTag to contact)
-            myFragment.arguments = args
-            return myFragment
-        }
+        fun newInstance(contact: ContactData): DetailsFragment =
+            DetailsFragment().apply { arguments = bundleOf(BundleTag to contact) }
     }
 }

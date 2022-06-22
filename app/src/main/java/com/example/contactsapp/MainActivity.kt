@@ -135,8 +135,6 @@ class MainActivity : AppCompatActivity() {
                             val rawContactId = getRawContactId(contactId.toString())
                             val companyName = getCompanyName(rawContactId!!) ?: ""
 
-
-
                             result.add(
                                 ContactData(
                                     contactId,
@@ -149,8 +147,6 @@ class MainActivity : AppCompatActivity() {
                         } while (cursor.moveToNext())
                     }
                 }
-
-
         }
         return result
     }
@@ -179,7 +175,6 @@ class MainActivity : AppCompatActivity() {
                             Log.d(TAG, "$contactId data: $it")
                             contactDetailsCursor.close()
                         }
-
                 }
             }
             string

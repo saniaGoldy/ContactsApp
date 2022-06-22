@@ -8,26 +8,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.contactsapp.databinding.FragmentContactItemBinding
 
 class MyContactRecyclerViewAdapter(
-    private val mOnContactClickListener: OnContactClickListener,
+    private val onContactClickListener: OnContactClickListener,
     private val values: List<ContactData>
 ) : RecyclerView.Adapter<MyContactRecyclerViewAdapter.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = ViewHolder(
+        FragmentContactItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        ),
+        onContactClickListener
+    )
 
-        return ViewHolder(
-            FragmentContactItemBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            ),
-            mOnContactClickListener
-        )
-
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
         holder.bind(values[position])
-    }
 
     override fun getItemCount(): Int = values.size
 
@@ -39,26 +34,21 @@ class MyContactRecyclerViewAdapter(
 
         private val idView: TextView = binding.name
 
-
         init {
             idView.setOnClickListener(this)
         }
 
-        fun bind(item: ContactData){
+        fun bind(item: ContactData) {
             val text = item.name + " : " + if (item.phoneNumber?.isNotEmpty() == true) {
                 item.phoneNumber
             } else "no phone"
             idView.text = text
         }
 
-        override fun onClick(v: View?) {
-            onContactClickListener.onClick(bindingAdapterPosition)
-        }
+        override fun onClick(v: View?) = onContactClickListener.onClick(bindingAdapterPosition)
     }
 
     interface OnContactClickListener {
         fun onClick(position: Int)
     }
-
-
 }
