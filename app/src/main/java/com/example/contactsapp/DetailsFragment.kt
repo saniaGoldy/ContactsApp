@@ -1,6 +1,7 @@
 package com.example.contactsapp
 
 import android.content.Intent
+import android.media.MediaDrm
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -23,13 +24,14 @@ class DetailsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
         var contact: ContactData? = null
         if (arguments != null) {
-            contact = requireArguments().get("details") as ContactData?
-            Log.d(TAG, "detailsFragment: $contact")
-        }else{
-            Log.d(TAG, "detailsFragment: Bundle is null")
+            contact = requireArguments().get(BundleTag) as ContactData?
+            Log.d(BundleTag, "detailsFragment: $contact")
+        } else {
+            Log.d(BundleTag, "detailsFragment: Bundle is null")
         }
         view.setDataToUI(contact)
     }
@@ -50,13 +52,13 @@ class DetailsFragment : Fragment() {
                 } ?: noNumberLabel
                 text = phoneNumber
 
-                setOnClickListener {
-                    Log.d(TAG, "contactPhone clicked")
-                    Intent(Intent.ACTION_DIAL).also {
-                        it.data = Uri.parse("tel:${if (hasPhoneNumber) phoneNumber else ""}")
-                        startActivity(it)
-                    }
-                }
+                this.setIntentAction(
+                    hasPhoneNumber,
+                    phoneNumber,
+                    Intent.ACTION_DIAL,
+                    "tel:",
+                    "contactPhone clicked"
+                )
             }
 
             rootView.findViewById<TextView>(R.id.contactOrganization).text =
@@ -82,21 +84,39 @@ class DetailsFragment : Fragment() {
                 }
                 text = email
 
-                setOnClickListener {
-                    Log.d(TAG, "email clicked")
-                    Intent(Intent.ACTION_SENDTO).also {
-                        it.data = Uri.parse("mailto:${if (hasEmail) email else ""}")
-                        startActivity(it)
-                    }
-                }
+                this.setIntentAction(
+                    hasEmail,
+                    email,
+                    Intent.ACTION_SENDTO,
+                    "mailto:",
+                    "email clicked"
+                )
             }
         }
     }
 
-    companion object{
+    private fun TextView.setIntentAction(
+        isEmpty: Boolean,
+        value: String,
+        action: String,
+        uriString: String,
+        logMessage: String
+    ) {
+        setOnClickListener {
+            Log.d(BundleTag, logMessage)
+            Intent(action).also {
+                it.data = Uri.parse("$uriString${if (isEmpty) value else ""}")
+                startActivity(it)
+            }
+        }
+    }
+
+
+    companion object {
+        const val BundleTag = "details"
         fun newInstance(contact: ContactData): DetailsFragment {
             val myFragment = DetailsFragment()
-            val args = bundleOf("details" to contact)
+            val args = bundleOf(BundleTag to contact)
             myFragment.arguments = args
             return myFragment
         }

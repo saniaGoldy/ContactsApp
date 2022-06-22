@@ -20,7 +20,7 @@ class ContactFragment : Fragment(), MyContactRecyclerViewAdapter.OnContactClickL
     private val contacts: MutableList<ContactData> = mutableListOf()
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        val data = requireArguments().get("data")
+        val data = requireArguments().get(BundleTag)
         if (data is MutableList<*>) {
             contacts.addAll(data as MutableList<ContactData>)
         }
@@ -52,23 +52,6 @@ class ContactFragment : Fragment(), MyContactRecyclerViewAdapter.OnContactClickL
         }
     }
 
-    /*override fun onStart() {
-        super.onStart()
-        requireActivity().apply {
-            IntentFilter().let { ifilter ->
-                ifilter.addAction(Intent.ACTION_POWER_CONNECTED)
-                ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
-                ifilter.addAction(Intent.ACTION_BATTERY_CHANGED)
-                registerReceiver(BatteryStatusReceiver(), ifilter)
-            }
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        requireActivity().unregisterReceiver(BatteryStatusReceiver())
-    }*/
-
     override fun onClick(position: Int) {
 
         val contact = contacts[position]
@@ -81,9 +64,10 @@ class ContactFragment : Fragment(), MyContactRecyclerViewAdapter.OnContactClickL
     }
 
     companion object {
+        private const val BundleTag = "data"
         fun newInstance(contacts: MutableList<ContactData>): ContactFragment {
             val myFragment = ContactFragment()
-            val args = bundleOf("data" to contacts)
+            val args = bundleOf(BundleTag to contacts)
             myFragment.arguments = args
             return myFragment
         }
