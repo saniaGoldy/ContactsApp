@@ -11,7 +11,6 @@ import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 
-
 class DetailsFragment : Fragment() {
 
     override fun onCreateView(

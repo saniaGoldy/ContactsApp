@@ -20,7 +20,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 
-
 const val TAG = "MyApp"
 
 val CONTACT_PROJECTION: Array<out String> = arrayOf(
@@ -31,7 +30,6 @@ val CONTACT_PROJECTION: Array<out String> = arrayOf(
 )
 
 class MainActivity : AppCompatActivity() {
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -66,8 +64,9 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        flow().onEach { Log.d(TAG, "battery status update")
-        findViewById<TextView>(R.id.tvBattery).text = it
+        flow().onEach {
+            Log.d(TAG, "battery status update")
+            findViewById<TextView>(R.id.tvBattery).text = it
         }.launchIn(lifecycleScope)
 
     }
