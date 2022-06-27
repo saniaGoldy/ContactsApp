@@ -37,11 +37,11 @@ class DetailsFragment : Fragment() {
     private fun View.setDataToUI(contact: ContactData?) {
         this.also { rootView ->
             rootView.findViewById<TextView>(R.id.contactName).text =
-                contact?.name ?: "Cant find a name"
+                contact?.name ?: context.getString(R.string.cant_find_a_name)
 
             rootView.findViewById<TextView>(R.id.contactPhone).apply {
                 var hasPhoneNumber = false
-                val noNumberLabel = "no phone number"
+                val noNumberLabel = context.getString(R.string.no_phone_number)
                 val phoneNumber = contact?.let {
                     if (contact.phoneNumber?.isNotEmpty() == true) {
                         hasPhoneNumber = true
@@ -61,24 +61,23 @@ class DetailsFragment : Fragment() {
 
             rootView.findViewById<TextView>(R.id.contactOrganization).text =
                 buildString {
-                    append("Organization name: ")
+                    append(context.getString(R.string.organization_name_label))
                     append(
                         if (contact?.organization?.isNotEmpty() == true) {
                             contact.organization
                         } else {
-                            "no organization"
+                            context.getString(R.string.no_organization)
                         }
                     )
                 }
 
             rootView.findViewById<TextView>(R.id.contactEmail).apply {
                 var hasEmail = false
-                val noEmailLabel = "no email"
                 val email = contact.let {
                     if (contact?.email?.isNotEmpty() == true) {
                         hasEmail = true
                         contact.email
-                    } else noEmailLabel
+                    } else context.getString(R.string.no_email)
                 }
                 text = email
 

@@ -1,5 +1,6 @@
 package com.example.contactsapp
 
+import android.app.Application
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,7 +42,7 @@ class MyContactRecyclerViewAdapter(
         fun bind(item: ContactData) {
             val text = item.name + " : " + if (item.phoneNumber?.isNotEmpty() == true) {
                 item.phoneNumber
-            } else "no phone"
+            } else R.string.no_phone
             idView.text = text
         }
 

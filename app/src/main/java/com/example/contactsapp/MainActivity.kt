@@ -19,6 +19,8 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 const val TAG = "MyApp"
 
@@ -31,6 +33,7 @@ val CONTACT_PROJECTION: Array<out String> = arrayOf(
 
 class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
+    val executorService: ExecutorService = Executors.newFixedThreadPool(2)
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -40,15 +43,23 @@ class MainActivity : AppCompatActivity() {
             requestReadContactsPermission()
         }
 
-        val contacts = requestContacts()
+        requestContacts{
+            showContactListFragment(savedInstanceState, it)
+        }
+        showContactListFragment(savedInstanceState, mutableListOf())
+    }
+
+    private fun showContactListFragment(
+        savedInstanceState: Bundle?,
+        it: MutableList<ContactData>
+    ) {
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                val contactsFragment = ContactFragment.newInstance(contacts)
+                val contactsFragment = ContactFragment.newInstance(it)
                 replace(R.id.fragmentContainerView, contactsFragment)
             }
         }
-
     }
 
     private fun requestReadContactsPermission() {
@@ -64,14 +75,14 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        flow().onEach {
+        broadcastReceiverWrapperFlow().onEach {
             Log.d(TAG, "battery status update")
             findViewById<TextView>(R.id.tvBattery).text = it
         }.launchIn(lifecycleScope)
 
     }
 
-    private fun flow(): Flow<String> = callbackFlow {
+    private fun broadcastReceiverWrapperFlow(): Flow<String> = callbackFlow {
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent != null) {
@@ -82,19 +93,19 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, "onReceive: battery status is $status")
                     trySend(
                         when (status) {
-                            BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Charging disconnected"
-                            BatteryManager.BATTERY_STATUS_CHARGING -> "Charging connected"
-                            else -> "battery status"
+                            BatteryManager.BATTERY_STATUS_NOT_CHARGING -> getString(R.string.charging_disconnected)
+                            BatteryManager.BATTERY_STATUS_CHARGING -> getString(R.string.charging_connected)
+                            else -> getString(R.string.battery_status_string)
                         }
                     ).isSuccess
                 }
             }
         }
-        IntentFilter().let { ifilter ->
-            ifilter.addAction(Intent.ACTION_POWER_CONNECTED)
-            ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
-            ifilter.addAction(Intent.ACTION_BATTERY_CHANGED)
-            this@MainActivity.registerReceiver(receiver, ifilter)
+        IntentFilter().let { iFilter ->
+            iFilter.addAction(Intent.ACTION_POWER_CONNECTED)
+            iFilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
+            iFilter.addAction(Intent.ACTION_BATTERY_CHANGED)
+            this@MainActivity.registerReceiver(receiver, iFilter)
         }
         awaitClose {
             this@MainActivity.unregisterReceiver(receiver)
@@ -102,52 +113,54 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun requestContacts(): MutableList<ContactData> {
+    private fun requestContacts(callback: (MutableList<ContactData>)-> Unit){
         val result: MutableList<ContactData> = mutableListOf()
 
-        runBlocking {
-            this@MainActivity.contentResolver.query(
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                null,
-                null,
-                null
-            )
-                ?.also { cursor ->
-                    if (cursor.moveToFirst()) {
-                        do {
-                            val contactId =
-                                cursor.getLong(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[0]))
-                            Log.d(TAG, "requestContacts: contact $contactId request")
-                            val name =
-                                cursor.getString(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[2]))
-                                    ?: ""
-                            val phone = requestContactDetail(
-                                contactId,
-                                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                ContactsContract.CommonDataKinds.Phone.NUMBER
-                            )
-                            val email = requestContactDetail(
-                                contactId,
-                                ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-                                ContactsContract.CommonDataKinds.Email.ADDRESS
-                            )
-                            val rawContactId = getRawContactId(contactId.toString())
-                            val companyName = getCompanyName(rawContactId!!) ?: ""
-
-                            result.add(
-                                ContactData(
+        executorService.execute{
+            runBlocking {
+                this@MainActivity.contentResolver.query(
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    null,
+                    null,
+                    null
+                )
+                    ?.also { cursor ->
+                        if (cursor.moveToFirst()) {
+                            do {
+                                val contactId =
+                                    cursor.getLong(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[0]))
+                                Log.d(TAG, "requestContacts: contact $contactId request")
+                                val name =
+                                    cursor.getString(cursor.getColumnIndexOrThrow(CONTACT_PROJECTION[2]))
+                                        ?: ""
+                                val phone = requestContactDetail(
                                     contactId,
-                                    name,
-                                    phone,
-                                    companyName,
-                                    email
-                                ).also { Log.d(TAG, it.phoneNumber.toString()) })
+                                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                    ContactsContract.CommonDataKinds.Phone.NUMBER
+                                )
+                                val email = requestContactDetail(
+                                    contactId,
+                                    ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                                    ContactsContract.CommonDataKinds.Email.ADDRESS
+                                )
+                                val rawContactId = getRawContactId(contactId.toString())
+                                val companyName = getCompanyName(rawContactId!!) ?: ""
 
-                        } while (cursor.moveToNext())
+                                result.add(
+                                    ContactData(
+                                        contactId,
+                                        name,
+                                        phone,
+                                        companyName,
+                                        email
+                                    ).also { Log.d(TAG, it.phoneNumber.toString()) })
+
+                            } while (cursor.moveToNext())
+                        }
                     }
-                }
+            }
+            callback(result)
         }
-        return result
     }
 
     private suspend fun requestContactDetail(
@@ -156,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         columnName: String
     ): String {
         return withContext(lifecycleScope.coroutineContext + Dispatchers.IO) {
-            var string = "Can`t get details"
+            var string = ""
             contentResolver.query(
                 uri,
                 null,
