@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">ContactsApp</string>
     <string name="contact_item_error_message">Something went wrong</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="battery_status">BatteryStatus</string>
+    <string name="charging_disconnected">Charging disconnected</string>
+    <string name="charging_connected">Charging connected</string>
+    <string name="battery_status_string">battery status</string>
+    <string name="cant_get_details">Can`t get details</string>
+    <string name="cant_find_a_name">Can\'t find a name</string>
+    <string name="no_phone_number">no phone number</string>
+    <string name="no_organization">no organization</string>
+    <string name="organization_name_label">\"Organization name: \"</string>
+    <string name="no_email">no email</string>
+    <string name="no_phone">no phone</string>
 </resources>
